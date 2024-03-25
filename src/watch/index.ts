@@ -54,7 +54,6 @@ export function watchDeps(onRebuild: (entry: string) => void) {
   const debounceTimers: DebounceTimers = {};
 
   watch.on("all", (event, path) => {
-    console.log("--- event/path", event, path);
     switch (event) {
       case "change":
       case "unlink":
