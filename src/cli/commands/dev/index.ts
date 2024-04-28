@@ -102,26 +102,36 @@ export default class Dev extends Command {
       return writeEsbuildFile(build);
     }
 
+    let exiting = false;
+
     const children: cp.ChildProcessWithoutNullStreams[] = [];
 
-    const signals = ["SIGINT", "SIGTERM", "SIGHUP", "SIGQUIT"];
+    function addChild(child: cp.ChildProcessWithoutNullStreams) {
+      children.push(child);
+
+      child.on("exit", (code, signal) => {
+        children.splice(children.indexOf(child), 1);
+        if (exiting) exitIfNoChildren();
+      });
+    }
+
+    function exitIfNoChildren() {
+      if (!children.length) {
+        console.log("No children running, exiting main process...");
+        process.exit(0);
+      }
+    }
+
+    const signals = ["SIGINT", "SIGTERM", "SIGHUP", "SIGQUIT"] as const;
 
     signals.forEach((signal) => {
       process.on(signal, () => {
         console.log(`Received ${signal}, notifying children...`);
 
-        children.forEach((child) => {
-          child.on("exit", (code, signal) => {
-            children.splice(children.indexOf(child), 1);
+        exiting = true;
+        exitIfNoChildren();
 
-            if (!children.length) {
-              console.log("All children exited, exiting main process...");
-              process.exit(0);
-            }
-          });
-        });
-
-        children.forEach((child) => child.kill("SIGINT"));
+        children.forEach((child) => child.kill(signal));
       });
     });
 
@@ -165,7 +175,7 @@ export default class Dev extends Command {
             }
           );
 
-          children.push(firebaseChild);
+          addChild(firebaseChild);
 
           watchChildLog({
             child: firebaseChild,
@@ -237,7 +247,7 @@ export default class Dev extends Command {
           shell: true,
         });
 
-        children.push(astroChild);
+        addChild(astroChild);
 
         watchChildLog({
           child: astroChild,
@@ -254,7 +264,7 @@ export default class Dev extends Command {
           shell: true,
         });
 
-        children.push(craChild);
+        addChild(craChild);
 
         watchChildLog({
           child: craChild,
@@ -271,7 +281,7 @@ export default class Dev extends Command {
           shell: true,
         });
 
-        children.push(viteChild);
+        addChild(viteChild);
 
         watchChildLog({
           child: viteChild,
@@ -289,7 +299,7 @@ export default class Dev extends Command {
           env: { ...process.env, NODE_ENV: "development" },
         });
 
-        children.push(remixChild);
+        addChild(remixChild);
 
         watchChildLog({
           child: remixChild,
@@ -307,7 +317,7 @@ export default class Dev extends Command {
           env: { ...process.env, NODE_ENV: "development" },
         });
 
-        children.push(nextChild);
+        addChild(nextChild);
 
         watchChildLog({
           child: nextChild,
