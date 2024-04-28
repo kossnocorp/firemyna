@@ -104,8 +104,25 @@ export default class Dev extends Command {
 
     const children: cp.ChildProcessWithoutNullStreams[] = [];
 
-    process.on("SIGINT", () => {
-      children.forEach((child) => child.kill("SIGINT"));
+    const signals = ["SIGINT", "SIGTERM", "SIGHUP", "SIGQUIT"];
+
+    signals.forEach((signal) => {
+      process.on(signal, () => {
+        console.log(`Received ${signal}, notifying children...`);
+
+        children.forEach((child) => {
+          child.on("exit", (code, signal) => {
+            children.splice(children.indexOf(child), 1);
+
+            if (!children.length) {
+              console.log("All children exited, exiting main process...");
+              process.exit(0);
+            }
+          });
+        });
+
+        children.forEach((child) => child.kill("SIGINT"));
+      });
     });
 
     watchListFunction(buildConfig, async (message) => {
