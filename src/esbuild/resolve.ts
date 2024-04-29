@@ -30,7 +30,6 @@ export function resolvePlugin(): Plugin {
             path,
             resolveContext,
             (err, resolved) => {
-              console.log({ resolveDir, path, resolved });
               if (err || !resolved)
                 return reject(
                   err || new Error(`Cannot resolve ${path} at ${resolveDir}`)
