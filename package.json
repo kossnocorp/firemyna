@@ -45,7 +45,6 @@
     "vitest": "^0.34.1"
   },
   "dependencies": {
-    "@esbuild-plugins/node-resolve": "^0.1.4",
     "@oclif/core": "^1.6.4",
     "@oclif/plugin-help": "^5.1.12",
     "@oclif/plugin-version": "^1.0.4",
@@ -54,6 +53,7 @@
     "chokidar": "^3.5.2",
     "cli-ux": "^5.6.3",
     "commander": "^8.3.0",
+    "enhanced-resolve": "^5.16.0",
     "esbuild": "^0.16.17",
     "estree-walker": "^2.0.2",
     "glob": "^7.2.0",

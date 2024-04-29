@@ -5,7 +5,7 @@ import { resolve } from "path";
 import { promisify } from "util";
 import { getBuildConfig } from "../../../build";
 import { prepareBuild } from "../../../build/prepare";
-import { loadConfig, configWithDefaults } from "../../../config";
+import { configWithDefaults, loadConfig } from "../../../config";
 import { listPkgDependencies, parseBuildDependencies } from "../../../deps";
 import { writeEsbuildFile } from "../../../esbuild";
 import { buildFile, buildFunctions } from "../../../functions";

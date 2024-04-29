@@ -1,17 +1,17 @@
-import NodeResolve from "@esbuild-plugins/node-resolve";
 import chokidar from "chokidar";
 import { build, BuildIncremental, BuildResult, OutputFile } from "esbuild";
 import { readdir, readFile, stat } from "fs/promises";
 import { sweep } from "js-fns";
 import {
-  parse as parsePath,
-  relative,
-  resolve,
   basename,
   extname,
   normalize,
+  parse as parsePath,
+  relative,
+  resolve,
 } from "path";
 import { FiremynaBuildConfig } from "../build";
+import { resolvePlugin } from "../esbuild/resolve";
 
 /**
  * Firebase Function defenition.
@@ -358,13 +358,8 @@ export function buildFile<Incremental extends boolean | undefined>({
             resolveDir: resolvePath,
           }
         : undefined,
-    plugins: [
-      NodeResolve({
-        extensions: [".ts", ".tsx", ".js", ".jsx", ".cjs", ".mjs"],
-        onResolved: (resolved) =>
-          resolved.includes("node_modules") ? { external: true } : resolved,
-      }),
-    ],
+
+    plugins: [resolvePlugin()],
     allowOverwrite: true,
     write: false,
     incremental,
