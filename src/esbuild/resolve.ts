@@ -34,9 +34,10 @@ export function resolvePlugin(): Plugin {
                 return reject(
                   err || new Error(`Cannot resolve ${path} at ${resolveDir}`)
                 );
+              const external = resolved.includes("node_modules");
               resolve({
-                path: resolved,
-                external: resolved.includes("node_modules"),
+                path: external ? path : resolved,
+                external,
               });
             }
           );
